@@ -1,0 +1,31 @@
+{
+  "name": "@vod/player",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.esm.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.cjs.js"
+    },
+    "./svelte": "./src/SveltePlayer.svelte"
+  },
+  "files": ["dist", "src/SveltePlayer.svelte"],
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^4.0.0",
+    "jsdom": "^24.1.3",
+    "shaka-player": "^4.7.11",
+    "svelte": "^4.2.18",
+    "typescript": "^5.5.3",
+    "vite": "^5.3.3",
+    "vitest": "^1.6.0"
+  },
+  "peerDependencies": {
+    "shaka-player": ">=4"
+  }
+}

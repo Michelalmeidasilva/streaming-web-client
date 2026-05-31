@@ -26,6 +26,7 @@
     "vitest": "^1.6.0"
   },
   "peerDependencies": {
-    "shaka-player": ">=4"
+    "shaka-player": ">=4",
+    "svelte": "^4 || ^5"
   }
 }

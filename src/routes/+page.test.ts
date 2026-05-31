@@ -7,10 +7,10 @@ vi.mock('$lib/api', () => ({
   listVideos: vi.fn(),
 }));
 
-import { listVideos } from '$lib/api';
+import { listVideos, type Video } from '$lib/api';
 import { goto } from '$app/navigation';
 
-const mockVideos = [
+const mockVideos: Video[] = [
   { id: '1', title: 'Big Buck Bunny', duration: 540, thumbnail_url: null, format: 'dash' },
   { id: '2', title: 'Elephant Dream', duration: 660, thumbnail_url: null, format: 'dash' },
 ];

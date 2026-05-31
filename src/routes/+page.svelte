@@ -59,52 +59,52 @@
     <button on:click={load} class="btn-retry">Atualizar</button>
   </div>
 {:else}
-  <div class="catalog">
-    {@const [hero, ...rest] = videos}
-
-    <!-- Hero -->
-    <button class="hero" on:click={() => watch(hero.id)} aria-label="Assistir {hero.title}">
-      <div class="hero-thumb">
-        {#if hero.thumbnail_url}
-          <img src={hero.thumbnail_url} alt={hero.title} />
-        {:else}
-          <div class="thumb-placeholder" />
-        {/if}
-        <div class="hero-overlay">
-          <div class="badge">{hero.format.toUpperCase()}</div>
-          <h1 class="hero-title">{hero.title}</h1>
-          <p class="hero-meta">{fmtDuration(hero.duration)}</p>
-          <span class="btn-play">▶ Assistir</span>
+  {#each videos.slice(0, 1) as hero}
+    <div class="catalog">
+      <!-- Hero -->
+      <button class="hero" on:click={() => watch(hero.id)} aria-label="Assistir {hero.title}">
+        <div class="hero-thumb">
+          {#if hero.thumbnail_url}
+            <img src={hero.thumbnail_url} alt={hero.title} />
+          {:else}
+            <div class="thumb-placeholder" />
+          {/if}
+          <div class="hero-overlay">
+            <div class="badge">{hero.format.toUpperCase()}</div>
+            <h1 class="hero-title">{hero.title}</h1>
+            <p class="hero-meta">{fmtDuration(hero.duration)}</p>
+            <span class="btn-play">▶ Assistir</span>
+          </div>
         </div>
-      </div>
-    </button>
+      </button>
 
-    <!-- Grid -->
-    {#if rest.length > 0}
-      <section class="more">
-        <h2 class="section-title">Mais vídeos</h2>
-        <div class="grid">
-          {#each rest as video}
-            <button
-              class="card"
-              on:click={() => watch(video.id)}
-              aria-label="Assistir {video.title}"
-            >
-              <div class="card-thumb">
-                {#if video.thumbnail_url}
-                  <img src={video.thumbnail_url} alt={video.title} />
-                {:else}
-                  <div class="thumb-placeholder" />
-                {/if}
-                <span class="card-duration">{fmtDuration(video.duration)}</span>
-              </div>
-              <p class="card-title">{video.title}</p>
-            </button>
-          {/each}
-        </div>
-      </section>
-    {/if}
-  </div>
+      <!-- Grid -->
+      {#if videos.length > 1}
+        <section class="more">
+          <h2 class="section-title">Mais vídeos</h2>
+          <div class="grid">
+            {#each videos.slice(1) as video}
+              <button
+                class="card"
+                on:click={() => watch(video.id)}
+                aria-label="Assistir {video.title}"
+              >
+                <div class="card-thumb">
+                  {#if video.thumbnail_url}
+                    <img src={video.thumbnail_url} alt={video.title} />
+                  {:else}
+                    <div class="thumb-placeholder" />
+                  {/if}
+                  <span class="card-duration">{fmtDuration(video.duration)}</span>
+                </div>
+                <p class="card-title">{video.title}</p>
+              </button>
+            {/each}
+          </div>
+        </section>
+      {/if}
+    </div>
+  {/each}
 {/if}
 
 <style>

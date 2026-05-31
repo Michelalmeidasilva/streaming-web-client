@@ -7,10 +7,8 @@ export default defineConfig({
     sveltekit(),
     VitePWA({
       registerType: 'autoUpdate',
-      srcDir: 'src',
-      filename: 'service-worker.ts',
-      strategies: 'injectManifest',
-      injectManifest: {
+      strategies: 'generateSW',
+      workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
       },
       manifest: false,

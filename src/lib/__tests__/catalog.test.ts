@@ -1,6 +1,6 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/svelte';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import Page from './+page.svelte';
+import Page from '../../routes/+page.svelte';
 
 vi.mock('$app/navigation', () => ({ goto: vi.fn() }));
 vi.mock('$lib/api', () => ({

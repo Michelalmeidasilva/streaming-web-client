@@ -4,6 +4,7 @@ import type { VodPlayerOptions, VodPlayerEventName, VodPlayerMountOptions } from
 export class VodPlayer {
   private player: InstanceType<typeof shaka.Player>;
   private listeners = new Map<VodPlayerEventName, Function>();
+  private readyPromise: Promise<void>;
 
   constructor(container: string | HTMLElement, private options: VodPlayerOptions) {
     const el = typeof container === 'string'
@@ -19,7 +20,7 @@ export class VodPlayer {
     shaka.polyfill.installAll();
     this.player = new shaka.Player();
 
-    this.player.attach(video).then(() => {
+    this.readyPromise = this.player.attach(video).then(() => {
       this.player.getNetworkingEngine()!.registerRequestFilter(
         (_type: unknown, request: { headers: Record<string, string> }) => {
           request.headers['X-API-Key'] = this.options.apiKey;
@@ -28,17 +29,18 @@ export class VodPlayer {
 
       new shaka.ui.Overlay(this.player, el, video);
 
-      this.player.addEventListener('error', (event: { detail: unknown }) => {
+      this.player.addEventListener('error', ((event: CustomEvent<unknown>) => {
         this.listeners.get('error')?.(event.detail);
-      });
+      }) as EventListener);
 
-      this.player.addEventListener('buffering', (event: { detail: { buffering: boolean } }) => {
+      this.player.addEventListener('buffering', ((event: CustomEvent<{ buffering: boolean }>) => {
         this.listeners.get('buffering')?.(event.detail.buffering);
-      });
+      }) as EventListener);
     });
   }
 
   async load(manifestUrl: string): Promise<void> {
+    await this.readyPromise;
     await this.player.load(manifestUrl);
     this.listeners.get('loaded')?.({});
   }

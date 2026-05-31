@@ -8,11 +8,10 @@ vi.mock('$env/static/public', () => ({
 import { listVideos, getManifest } from '../api';
 
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
 
 describe('api.ts', () => {
-  beforeEach(() => vi.clearAllMocks());
-  afterEach(() => vi.restoreAllMocks());
+  beforeEach(() => { vi.stubGlobal('fetch', mockFetch); vi.clearAllMocks(); });
+  afterEach(() => { vi.restoreAllMocks(); });
 
   describe('listVideos()', () => {
     it('chama /api/v1/videos com X-API-Key correto', async () => {

@@ -1,3 +1,4 @@
+/// <reference types="@sveltejs/kit" />
 import { PUBLIC_DISTRIBUTION_URL, PUBLIC_API_KEY } from '$env/static/public';
 
 export const DISTRIBUTION_URL = PUBLIC_DISTRIBUTION_URL;

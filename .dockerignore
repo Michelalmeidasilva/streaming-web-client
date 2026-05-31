@@ -1,0 +1,10 @@
+node_modules
+packages/*/node_modules
+build
+packages/player/dist
+.svelte-kit
+.design-docs
+*.md
+!README.md
+.env*
+.git

@@ -26,14 +26,18 @@ Consumer-facing PWA para visualização de vídeos DASH/HLS. Consome manifests s
 
 ## Integração com streaming-distribution
 
-Endpoints consumidos (assumidos — SPEC do distribution vazio):
+Endpoints consumidos (confirmados — ver `docs/distribution-integration.md`):
 
-| Método | Path | Descrição |
-|---|---|---|
-| GET | `/api/v1/videos` | Lista vídeos disponíveis |
-| GET | `/api/v1/manifests/:id` | Retorna `{ manifest_url, type }` |
+| Método | Path | Resposta do distribution | Uso |
+|---|---|---|---|
+| GET | `/api/v1/videos` | `[{id,title,duration,thumbnail_url,format}]` | catálogo (`/`) — `thumbnail_url` null → fallback `default-thumbnail.png` |
+| GET | `/api/v1/manifest/:id` | `{videoId,status,hls,dash,cached}` | player (`/watch/[id]`) |
 
-Header obrigatório: `X-API-Key: <pk_xxx>` em todas as chamadas.
+`getManifest()` mapeia a resposta do distribution para `{ manifest_url, type }`
+(prefere HLS). Header obrigatório: `X-API-Key: <pk_xxx>` em todas as chamadas.
+
+> Config: usar `svelte.config.js` (não `.ts`) — o build de produção em Docker
+> (Node 20) não importa config TypeScript.
 
 ## Variáveis de Ambiente
 

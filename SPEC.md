@@ -21,8 +21,25 @@ Consumer-facing PWA para visualização de vídeos DASH/HLS. Consome manifests s
 
 | Rota | Descrição |
 |---|---|
-| `/` | Catálogo de vídeos (hero + grid) |
-| `/watch/[id]` | Player page com Shaka Player |
+| `/` | Catálogo de vídeos (stories rail + reels rail + hero em destaque + grid + busca client-side) |
+| `/watch/[id]` | Player page com Shaka Player, título, chips de metadados e lista "A seguir" |
+| `/reels` | Feed vertical imersivo de reels (scroll-snap) |
+
+## Reels & Stories (derivados de `duration`)
+
+Os vídeos são particionados em três categorias mutuamente exclusivas com base na duração, configurável via variáveis de ambiente:
+
+| Categoria | Condição | Uso na UI |
+|---|---|---|
+| **Story** | `duration <= PUBLIC_STORY_MAX_SECONDS` (padrão 30 s) | Rail de stories horizontal; viewer com barras de progresso e auto-avanço |
+| **Reel** | `PUBLIC_STORY_MAX_SECONDS < duration <= PUBLIC_REEL_MAX_SECONDS` (padrão 90 s) | Rail de reels horizontal + rota `/reels` (scroll-snap vertical) |
+| **Catálogo** | `duration > PUBLIC_REEL_MAX_SECONDS` | Hero em destaque + grid geral |
+
+**Regra de partição:** os intervalos são não-sobrepostos — um vídeo pertence a exatamente uma categoria.
+
+**Caveat de thumbnail:** o campo `thumbnail_url` retorna imagens 16:9. As superfícies de Stories e Reels exibem molduras 9:16; as imagens são renderizadas com `object-fit: cover`, centralizadas, com as bordas laterais cortadas. Não existe campo de thumbnail retrato na API atual. Quando `thumbnail_url` é `null`, o fallback é `/default-thumbnail.png`.
+
+**Busca no catálogo:** filtro client-side por título (acento-insensível via `normalize('NFD')`). Não há novo endpoint — a busca opera sobre a lista já carregada de `/api/v1/videos`.
 
 ## Integração com streaming-distribution
 
@@ -45,8 +62,14 @@ Endpoints consumidos (confirmados — ver `docs/distribution-integration.md`):
 |---|---|---|
 | `PUBLIC_DISTRIBUTION_URL` | URL do streaming-distribution | `http://localhost:8082` |
 | `PUBLIC_API_KEY` | API key para autenticação | `pk_dev` |
+| `PUBLIC_STORY_MAX_SECONDS` | Duração máxima (inclusive) para classificar como Story | `30` |
+| `PUBLIC_REEL_MAX_SECONDS` | Duração máxima (inclusive) para classificar como Reel | `90` |
 
 > **Nota:** Prefixo `PUBLIC_` expõe ao cliente SvelteKit (`$env/static/public`). Valores são embutidos no build estático.
+
+## Renderização (SPA)
+
+O app é distribuído como SPA estática via adapter-static (`fallback: index.html`). O arquivo `src/routes/+layout.ts` exporta `ssr = false` e `prerender = false` porque o Shaka Player acessa `document` no momento da importação — o que quebra o ambiente SSR do SvelteKit. Toda navegação é client-side; o servidor (nginx em Docker) serve `index.html` para qualquer rota desconhecida.
 
 ## SDK @vod/player — API Pública
 

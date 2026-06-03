@@ -4,6 +4,20 @@
   `static/default-thumbnail.png` when `thumbnail_url` is null (was an empty
   placeholder div). The component already consumed `thumbnail_url` from
   `GET /api/v1/videos`; this change ensures a visible image is always shown.
+- Redesign completo do cliente web para estilo Vimeo (tema escuro refinado,
+  tokens de cor, tipografia Schibsted Grotesk, nav com blur, motion contido).
+- Página de player reconstruída com título, chips de metadados e lista "A seguir".
+
+### Added
+- Surfaces **Reels** e **Stories** derivados de `duration` (limiares via
+  `PUBLIC_STORY_MAX_SECONDS` / `PUBLIC_REEL_MAX_SECONDS`).
+- Viewer imersivo de Stories (barras de progresso, auto-avanço, navegação por toque/teclado).
+- Rota `/reels`: feed vertical com scroll-snap.
+- Busca client-side no catálogo (filtro por título, acento-insensível).
+
+### Fixed
+- SSR desabilitado app-wide (`src/routes/+layout.ts`, `ssr = false`) — o app é uma
+  SPA estática e o Shaka acessa `document` na importação, o que quebrava `npm run dev`.
 
 ## [Unreleased] 2026-05-31 — End-to-end playback integration
 

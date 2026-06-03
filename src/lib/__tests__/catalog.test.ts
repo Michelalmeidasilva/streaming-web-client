@@ -3,12 +3,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Page from '../../routes/+page.svelte';
 
 vi.mock('$app/navigation', () => ({ goto: vi.fn() }));
-vi.mock('$lib/api', () => ({
-  listVideos: vi.fn(),
-}));
+vi.mock('$lib/api', () => ({ listVideos: vi.fn(), getManifest: vi.fn() }));
+vi.mock('@vod/player/svelte', () => ({ default: vi.fn() }));
 
 import { listVideos, type Video } from '$lib/api';
 import { goto } from '$app/navigation';
+import { searchQuery } from '$lib/search';
 
 const mockVideos: Video[] = [
   { id: '1', title: 'Big Buck Bunny', duration: 540, thumbnail_url: null, format: 'dash' },
@@ -16,7 +16,7 @@ const mockVideos: Video[] = [
 ];
 
 describe('+page.svelte (Catálogo)', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => { vi.clearAllMocks(); searchQuery.set(''); });
 
   it('mostra skeleton durante carregamento', () => {
     vi.mocked(listVideos).mockReturnValue(new Promise(() => {}));
@@ -59,5 +59,30 @@ describe('+page.svelte (Catálogo)', () => {
     await waitFor(() => screen.getByLabelText('Assistir Big Buck Bunny'));
     await fireEvent.click(screen.getByLabelText('Assistir Big Buck Bunny'));
     expect(goto).toHaveBeenCalledWith('/watch/1');
+  });
+
+  it('mostra stories e reels conforme a duração', async () => {
+    vi.mocked(listVideos).mockResolvedValue([
+      { id: 's', title: 'Curtinho', duration: 12, thumbnail_url: null, format: 'hls' },
+      { id: 'r', title: 'Reelzinho', duration: 60, thumbnail_url: null, format: 'hls' },
+      { id: 'l', title: 'Longo', duration: 600, thumbnail_url: null, format: 'hls' },
+    ]);
+    render(Page);
+    await waitFor(() => expect(screen.getByText('Longo')).toBeInTheDocument());
+    expect(screen.getByLabelText('Ver story Curtinho')).toBeInTheDocument();
+    expect(screen.getByText('Reelzinho')).toBeInTheDocument();
+    expect(screen.getByText('Reels')).toBeInTheDocument();
+  });
+
+  it('filtra o grid pelo termo de busca', async () => {
+    vi.mocked(listVideos).mockResolvedValue([
+      { id: '1', title: 'Onboarding', duration: 600, thumbnail_url: null, format: 'hls' },
+      { id: '2', title: 'Webinar', duration: 700, thumbnail_url: null, format: 'hls' },
+    ]);
+    render(Page);
+    await waitFor(() => expect(screen.getByText('Onboarding')).toBeInTheDocument());
+    searchQuery.set('webin');
+    await waitFor(() => expect(screen.queryByText('Onboarding')).toBeNull());
+    expect(screen.getByText('Webinar')).toBeInTheDocument();
   });
 });

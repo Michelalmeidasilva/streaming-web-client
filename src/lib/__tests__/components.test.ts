@@ -5,6 +5,7 @@ import VideoGrid from '$lib/components/VideoGrid.svelte';
 import HeroFeature from '$lib/components/HeroFeature.svelte';
 import ReelsRail from '$lib/components/ReelsRail.svelte';
 import StoryViewer from '$lib/components/StoryViewer.svelte';
+import StoriesRail from '$lib/components/StoriesRail.svelte';
 
 vi.mock('$app/navigation', () => ({ goto: vi.fn() }));
 vi.mock('@vod/player/svelte', () => ({ default: vi.fn() }));
@@ -63,5 +64,20 @@ describe('StoryViewer', () => {
     const onSeen = vi.fn();
     render(StoryViewer, { stories: [v('s1', 'Story One', 12)], startIndex: 0, onClose: vi.fn(), onSeen });
     expect(onSeen).toHaveBeenCalledWith('s1');
+  });
+});
+
+describe('StoriesRail', () => {
+  it('renders nothing when there are no stories', () => {
+    const { container } = render(StoriesRail, { stories: [] });
+    expect(container.querySelector('.stories-section')).toBeNull();
+  });
+
+  it('renders a bubble per story and opens the viewer on click', async () => {
+    render(StoriesRail, { stories: [v('s1', 'Hotfix', 12)] });
+    const btn = screen.getByLabelText('Ver story Hotfix');
+    expect(btn).toBeInTheDocument();
+    await fireEvent.click(btn);
+    expect(screen.getByRole('dialog', { name: 'Stories' })).toBeInTheDocument();
   });
 });

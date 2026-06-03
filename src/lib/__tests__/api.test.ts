@@ -47,34 +47,24 @@ describe('api.ts', () => {
   });
 
   describe('getManifest()', () => {
-    it('chama /api/v1/manifest/:id (singular)', async () => {
+    it('chama /api/v1/manifests/:id', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ videoId: 'abc123', status: 'ready', hls: 'https://cdn/v.m3u8', dash: 'https://cdn/v.mpd', cached: false }),
+        json: async () => ({ manifest_url: 'https://cdn/video.mpd', type: 'dash' }),
       });
 
       await getManifest('abc123');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:8082/api/v1/manifest/abc123',
+        'http://localhost:8082/api/v1/manifests/abc123',
         expect.anything()
       );
     });
 
-    it('prefere HLS: mapeia hls para manifest_url e type=hls', async () => {
+    it('retorna manifest_url e type', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ videoId: 'abc123', status: 'ready', hls: 'https://cdn/v.m3u8', dash: 'https://cdn/v.mpd', cached: false }),
-      });
-
-      const result = await getManifest('abc123');
-      expect(result).toEqual({ manifest_url: 'https://cdn/v.m3u8', type: 'hls' });
-    });
-
-    it('faz fallback para DASH quando hls ausente', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ videoId: 'abc123', status: 'ready', hls: '', dash: 'https://cdn/v.mpd', cached: false }),
+        json: async () => ({ manifest_url: 'https://cdn/v.mpd', type: 'dash' }),
       });
 
       const result = await getManifest('abc123');

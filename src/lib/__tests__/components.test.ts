@@ -6,6 +6,7 @@ import HeroFeature from '$lib/components/HeroFeature.svelte';
 import ReelsRail from '$lib/components/ReelsRail.svelte';
 import StoryViewer from '$lib/components/StoryViewer.svelte';
 import StoriesRail from '$lib/components/StoriesRail.svelte';
+import UpNextList from '$lib/components/UpNextList.svelte';
 
 vi.mock('$app/navigation', () => ({ goto: vi.fn() }));
 vi.mock('@vod/player/svelte', () => ({ default: vi.fn() }));
@@ -79,5 +80,15 @@ describe('StoriesRail', () => {
     expect(btn).toBeInTheDocument();
     await fireEvent.click(btn);
     expect(screen.getByRole('dialog', { name: 'Stories' })).toBeInTheDocument();
+  });
+});
+
+describe('UpNextList', () => {
+  it('lists videos and calls onSelect with id', async () => {
+    const onSelect = vi.fn();
+    render(UpNextList, { videos: [v('n1', 'Next One', 500), v('n2', 'Next Two', 600)], onSelect });
+    expect(screen.getByText('A seguir')).toBeInTheDocument();
+    await fireEvent.click(screen.getByLabelText('Assistir Next Two'));
+    expect(onSelect).toHaveBeenCalledWith('n2');
   });
 });

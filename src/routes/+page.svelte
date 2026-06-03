@@ -67,7 +67,7 @@
           {#if hero.thumbnail_url}
             <img src={hero.thumbnail_url} alt={hero.title} />
           {:else}
-            <div class="thumb-placeholder" />
+            <img src="/default-thumbnail.png" alt={hero.title} />
           {/if}
           <div class="hero-overlay">
             <div class="badge">{hero.format.toUpperCase()}</div>
@@ -93,7 +93,7 @@
                   {#if video.thumbnail_url}
                     <img src={video.thumbnail_url} alt={video.title} />
                   {:else}
-                    <div class="thumb-placeholder" />
+                    <img src="/default-thumbnail.png" alt={video.title} />
                   {/if}
                   <span class="card-duration">{fmtDuration(video.duration)}</span>
                 </div>

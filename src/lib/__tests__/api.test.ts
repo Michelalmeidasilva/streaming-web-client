@@ -3,6 +3,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 vi.mock('$env/static/public', () => ({
   PUBLIC_DISTRIBUTION_URL: 'http://localhost:8082',
   PUBLIC_API_KEY: 'pk_test',
+  PUBLIC_STORY_MAX_SECONDS: '30',
+  PUBLIC_REEL_MAX_SECONDS: '90',
 }));
 
 import { listVideos, getManifest } from '../api';
@@ -45,24 +47,34 @@ describe('api.ts', () => {
   });
 
   describe('getManifest()', () => {
-    it('chama /api/v1/manifests/:id', async () => {
+    it('chama /api/v1/manifest/:id (singular)', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ manifest_url: 'https://cdn/video.mpd', type: 'dash' }),
+        json: async () => ({ videoId: 'abc123', status: 'ready', hls: 'https://cdn/v.m3u8', dash: 'https://cdn/v.mpd', cached: false }),
       });
 
       await getManifest('abc123');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:8082/api/v1/manifests/abc123',
+        'http://localhost:8082/api/v1/manifest/abc123',
         expect.anything()
       );
     });
 
-    it('retorna manifest_url e type', async () => {
+    it('prefere HLS: mapeia hls para manifest_url e type=hls', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ manifest_url: 'https://cdn/v.mpd', type: 'dash' }),
+        json: async () => ({ videoId: 'abc123', status: 'ready', hls: 'https://cdn/v.m3u8', dash: 'https://cdn/v.mpd', cached: false }),
+      });
+
+      const result = await getManifest('abc123');
+      expect(result).toEqual({ manifest_url: 'https://cdn/v.m3u8', type: 'hls' });
+    });
+
+    it('faz fallback para DASH quando hls ausente', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ videoId: 'abc123', status: 'ready', hls: '', dash: 'https://cdn/v.mpd', cached: false }),
       });
 
       const result = await getManifest('abc123');

@@ -36,3 +36,6 @@ yarn-error.log*
 !.vscode/extensions.json
 *.swp
 Thumbs.db
+
+# design-docs brainstorm visual companion (local, ephemeral)
+.design-docs/

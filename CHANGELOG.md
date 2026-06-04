@@ -1,3 +1,16 @@
+## [Unreleased] 2026-06-04
+### Fixed
+- `npm run dev` quebrava com **"500 Internal Error" em todas as rotas**. O pacote de
+  workspace `@vod/player` é symlinkado em `node_modules` e seu fonte Svelte
+  (`packages/player/src/SveltePlayer.svelte`) resolve para um caminho real **fora**
+  da allow-list de filesystem que o SvelteKit define no dev server. O Vite respondia
+  **403** ao fonte do player, o import dinâmico da rota falhava e o SvelteKit
+  renderizava a página de erro 500. Como o player é importado por todas as rotas
+  (catálogo via `StoryViewer`, `/reels`, `/watch/:id`), todas quebravam. Corrigido
+  adicionando `server.fs.allow: ['./packages']` em `vite.config.ts`. Afeta **apenas o
+  dev**: `vite build` empacota via Rollup e ignora `fs.allow`, então o build de
+  produção sempre funcionou. Ver `docs/dev-server-fs-allow.md`.
+
 ## [Unreleased] 2026-06-03
 ### Changed
 - Hero and catalog card components in `+page.svelte` now fall back to

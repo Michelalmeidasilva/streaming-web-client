@@ -32,8 +32,21 @@ export async function listVideos(): Promise<Video[]> {
   return res.json();
 }
 
+interface DistributionManifest {
+  videoId: string;
+  status: string;
+  hls: string;
+  dash: string;
+  cached: boolean;
+}
+
 export async function getManifest(id: string): Promise<ManifestResponse> {
-  const res = await apiFetch(`/api/v1/manifests/${id}`);
+  const res = await apiFetch(`/api/v1/manifest/${id}`);
   if (!res.ok) throw new Error(String(res.status));
-  return res.json();
+  const data: DistributionManifest = await res.json();
+  // Prefer HLS; fall back to DASH if absent. (streaming-transcode now advertises
+  // the audio codec in the HLS master only when an audio track is actually
+  // present, so video-only sources no longer trigger Shaka MSE error 3014.)
+  if (data.hls) return { manifest_url: data.hls, type: 'hls' };
+  return { manifest_url: data.dash, type: 'dash' };
 }

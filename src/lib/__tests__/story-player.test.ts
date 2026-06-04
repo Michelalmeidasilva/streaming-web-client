@@ -26,7 +26,9 @@ import StoryPlayer from '@vod/player/svelte/story';
 const flush = () => new Promise<void>((r) => setTimeout(r, 0));
 
 describe('StoryPlayer', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('creates a bare video (no shaka UI overlay) and loads the manifest', async () => {
     const { container } = render(StoryPlayer, { manifestUrl: 'm.mpd', apiKey: 'pk' });

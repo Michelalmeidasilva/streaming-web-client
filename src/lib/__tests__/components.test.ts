@@ -10,6 +10,7 @@ import UpNextList from '$lib/components/UpNextList.svelte';
 
 vi.mock('$app/navigation', () => ({ goto: vi.fn() }));
 vi.mock('@vod/player/svelte', () => ({ default: vi.fn() }));
+vi.mock('@vod/player/svelte/story', () => ({ default: vi.fn() }));
 vi.mock('$lib/api', () => ({ getManifest: vi.fn().mockRejectedValue(new Error('no-manifest')) }));
 
 const v = (id: string, title: string, duration: number): Video =>

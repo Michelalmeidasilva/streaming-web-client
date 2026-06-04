@@ -1,5 +1,14 @@
 ## [Unreleased] 2026-06-04
+### Added
+- `@vod/player/svelte/story` (`StoryPlayer`): superfície de reprodução headless, sem
+  controles, que encaminha `timeupdate`/`ended` do `<video>` via callbacks (`onTime`,
+  `onEnded`, `onError`).
+
 ### Fixed
+- Stories agora reproduzem de forma limpa, com a barra de progresso dirigida pela
+  reprodução real e ancorada na parte inferior; cada story auto-avança no fim real do
+  vídeo e o viewer fecha após o último. Substitui a abordagem anterior baseada em timer
+  de metadados + barra no topo + player de streaming embutido. Ver `docs/stories-playback.md`.
 - `npm run dev` quebrava com **"500 Internal Error" em todas as rotas**. O pacote de
   workspace `@vod/player` é symlinkado em `node_modules` e seu fonte Svelte
   (`packages/player/src/SveltePlayer.svelte`) resolve para um caminho real **fora**

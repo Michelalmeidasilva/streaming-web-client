@@ -64,7 +64,7 @@ describe('+page.svelte (Catálogo)', () => {
   it('mostra stories e reels conforme a duração', async () => {
     vi.mocked(listVideos).mockResolvedValue([
       { id: 's', title: 'Curtinho', duration: 12, thumbnail_url: null, format: 'hls' },
-      { id: 'r', title: 'Reelzinho', duration: 60, thumbnail_url: null, format: 'hls' },
+      { id: 'r', title: 'Reelzinho', duration: 150, thumbnail_url: null, format: 'hls' },
       { id: 'l', title: 'Longo', duration: 600, thumbnail_url: null, format: 'hls' },
     ]);
     render(Page);

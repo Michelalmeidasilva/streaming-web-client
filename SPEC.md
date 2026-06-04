@@ -31,8 +31,8 @@ Os vídeos são particionados em três categorias mutuamente exclusivas com base
 
 | Categoria | Condição | Uso na UI |
 |---|---|---|
-| **Story** | `duration <= PUBLIC_STORY_MAX_SECONDS` (padrão 30 s) | Rail de stories horizontal; viewer headless (`@vod/player/svelte/story`) sem controles, barra de progresso inferior dirigida pela reprodução real e auto-avanço no fim do vídeo |
-| **Reel** | `PUBLIC_STORY_MAX_SECONDS < duration <= PUBLIC_REEL_MAX_SECONDS` (padrão 90 s) | Rail de reels horizontal + rota `/reels` (scroll-snap vertical) |
+| **Story** | `duration <= PUBLIC_STORY_MAX_SECONDS` (padrão 90 s) | Rail de stories horizontal; viewer headless (`@vod/player/svelte/story`) sem controles, barra de progresso inferior dirigida pela reprodução real e auto-avanço no fim do vídeo |
+| **Reel** | `PUBLIC_STORY_MAX_SECONDS < duration <= PUBLIC_REEL_MAX_SECONDS` (padrão 250 s) | Rail de reels horizontal + rota `/reels` (scroll-snap vertical) |
 | **Catálogo** | `duration > PUBLIC_REEL_MAX_SECONDS` | Hero em destaque + grid geral |
 
 **Regra de partição:** os intervalos são não-sobrepostos — um vídeo pertence a exatamente uma categoria.
@@ -62,8 +62,8 @@ Endpoints consumidos (confirmados — ver `docs/distribution-integration.md`):
 |---|---|---|
 | `PUBLIC_DISTRIBUTION_URL` | URL do streaming-distribution | `http://localhost:8082` |
 | `PUBLIC_API_KEY` | API key para autenticação | `pk_dev` |
-| `PUBLIC_STORY_MAX_SECONDS` | Duração máxima (inclusive) para classificar como Story | `30` |
-| `PUBLIC_REEL_MAX_SECONDS` | Duração máxima (inclusive) para classificar como Reel | `90` |
+| `PUBLIC_STORY_MAX_SECONDS` | Duração máxima (inclusive) para classificar como Story | `90` |
+| `PUBLIC_REEL_MAX_SECONDS` | Duração máxima (inclusive) para classificar como Reel | `250` |
 
 > **Nota:** Prefixo `PUBLIC_` expõe ao cliente SvelteKit (`$env/static/public`). Valores são embutidos no build estático.
 

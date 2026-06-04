@@ -10,9 +10,9 @@ import { listVideos, getManifest, type Video } from '$lib/api';
 import Reels from '../../routes/reels/+page.svelte';
 
 const list: Video[] = [
-  { id: 'a', title: 'Reel A', duration: 40, thumbnail_url: null, format: 'hls' },
+  { id: 'a', title: 'Reel A', duration: 120, thumbnail_url: null, format: 'hls' },
   { id: 'b', title: 'Reel B', duration: 600, thumbnail_url: null, format: 'hls' },
-  { id: 'c', title: 'Reel C', duration: 70, thumbnail_url: null, format: 'hls' },
+  { id: 'c', title: 'Reel C', duration: 180, thumbnail_url: null, format: 'hls' },
 ];
 
 describe('reels route', () => {

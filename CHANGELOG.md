@@ -1,4 +1,13 @@
 ## [Unreleased] 2026-06-04
+### Changed
+- Faixas de duração reclassificadas: **Story `<= 90s` · Reel `90–250s` · Vídeo
+  `> 250s`** (antes Story `<=30`, Reel `30–90`, Vídeo `>90`). Vídeos acima de
+  90s vão para Reels; acima de 250s vão para o catálogo normal de vídeos.
+  Mudança apenas de valores — `partitionVideos` permanece genérico. Atualizados
+  os defaults de `PUBLIC_STORY_MAX_SECONDS` (90) e `PUBLIC_REEL_MAX_SECONDS`
+  (250) em `.env`, `config.ts` e no mock de testes. Ver
+  `docs/duration-thresholds.md`.
+
 ### Added
 - Legendas WebVTT: `getManifest` agora retorna `subtitles` (do
   streaming-distribution). `VodPlayer.load(url, subtitles)`, `SveltePlayer` e

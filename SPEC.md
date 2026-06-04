@@ -31,7 +31,7 @@ Os vídeos são particionados em três categorias mutuamente exclusivas com base
 
 | Categoria | Condição | Uso na UI |
 |---|---|---|
-| **Story** | `duration <= PUBLIC_STORY_MAX_SECONDS` (padrão 30 s) | Rail de stories horizontal; viewer com barras de progresso e auto-avanço |
+| **Story** | `duration <= PUBLIC_STORY_MAX_SECONDS` (padrão 30 s) | Rail de stories horizontal; viewer headless (`@vod/player/svelte/story`) sem controles, barra de progresso inferior dirigida pela reprodução real e auto-avanço no fim do vídeo |
 | **Reel** | `PUBLIC_STORY_MAX_SECONDS < duration <= PUBLIC_REEL_MAX_SECONDS` (padrão 90 s) | Rail de reels horizontal + rota `/reels` (scroll-snap vertical) |
 | **Catálogo** | `duration > PUBLIC_REEL_MAX_SECONDS` | Hero em destaque + grid geral |
 
@@ -84,6 +84,8 @@ class VodPlayer {
 ```
 
 Exports: ESM (`dist/index.esm.js`), CJS (`dist/index.cjs.js`), UMD (`dist/vod-player.umd.js`).
+
+Entry Svelte adicional: `@vod/player/svelte/story` exporta `StoryPlayer`, uma superfície de reprodução headless (sem `shaka.ui.Overlay`) para Stories, que encaminha `timeupdate`/`ended` do `<video>` via callbacks (`onTime`, `onEnded`, `onError`). O entry de streaming existente continua sendo `@vod/player/svelte` (`SveltePlayer`).
 
 ## Docker
 

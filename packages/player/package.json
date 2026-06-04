@@ -9,9 +9,10 @@
       "import": "./dist/index.esm.js",
       "require": "./dist/index.cjs.js"
     },
-    "./svelte": "./src/SveltePlayer.svelte"
+    "./svelte": "./src/SveltePlayer.svelte",
+    "./svelte/story": "./src/StoryPlayer.svelte"
   },
-  "files": ["dist", "src/SveltePlayer.svelte"],
+  "files": ["dist", "src/SveltePlayer.svelte", "src/StoryPlayer.svelte"],
   "scripts": {
     "build": "vite build",
     "test": "vitest run"

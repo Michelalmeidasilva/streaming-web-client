@@ -8,9 +8,17 @@ export interface Video {
   format: 'dash' | 'hls';
 }
 
+export interface SubtitleTrack {
+  url: string;
+  language?: string;
+  label?: string;
+  default?: boolean;
+}
+
 export interface ManifestResponse {
   manifest_url: string;
   type: 'dash' | 'hls';
+  subtitles: SubtitleTrack[];
 }
 
 async function apiFetch(path: string): Promise<Response> {
@@ -37,6 +45,7 @@ interface DistributionManifest {
   status: string;
   hls: string;
   dash: string;
+  subtitles?: SubtitleTrack[];
   cached: boolean;
 }
 
@@ -44,9 +53,10 @@ export async function getManifest(id: string): Promise<ManifestResponse> {
   const res = await apiFetch(`/api/v1/manifest/${id}`);
   if (!res.ok) throw new Error(String(res.status));
   const data: DistributionManifest = await res.json();
+  const subtitles = data.subtitles ?? [];
   // Prefer HLS; fall back to DASH if absent. (streaming-transcode now advertises
   // the audio codec in the HLS master only when an audio track is actually
   // present, so video-only sources no longer trigger Shaka MSE error 3014.)
-  if (data.hls) return { manifest_url: data.hls, type: 'hls' };
-  return { manifest_url: data.dash, type: 'dash' };
+  if (data.hls) return { manifest_url: data.hls, type: 'hls', subtitles };
+  return { manifest_url: data.dash, type: 'dash', subtitles };
 }

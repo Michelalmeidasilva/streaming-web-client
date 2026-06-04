@@ -1,5 +1,10 @@
 ## [Unreleased] 2026-06-04
 ### Added
+- Legendas WebVTT: `getManifest` agora retorna `subtitles` (do
+  streaming-distribution). `VodPlayer.load(url, subtitles)`, `SveltePlayer` e
+  `StoryPlayer` aceitam a prop `subtitles` e fazem side-load via
+  `player.addTextTrackAsync`, habilitando a faixa marcada como `default`. Falha
+  ao carregar uma faixa é não-fatal (apenas logada).
 - `@vod/player/svelte/story` (`StoryPlayer`): superfície de reprodução headless, sem
   controles, que encaminha `timeupdate`/`ended` do `<video>` via callbacks (`onTime`,
   `onEnded`, `onError`).

@@ -15,6 +15,7 @@
   let index = startIndex;
   let progress = 0; // 0..1 of current story, driven by real playback
   let manifestUrl = '';
+  let subtitles: import('$lib/api').SubtitleTrack[] = [];
   // Fallback: if a story's manifest fails to load, skip it after a short delay
   // instead of hanging on the skeleton forever (there is no playback timer now).
   let failTimer: ReturnType<typeof setTimeout> | undefined;
@@ -27,6 +28,7 @@
     index = i;
     progress = 0;
     manifestUrl = '';
+    subtitles = [];
     const story = stories[i];
     if (!story) return onClose();
     onSeen(story.id);
@@ -34,6 +36,7 @@
       const m = await getManifest(story.id);
       if (index !== i) return; // navigated away while loading — discard
       manifestUrl = m.manifest_url;
+      subtitles = m.subtitles;
     } catch {
       if (index !== i) return;
       manifestUrl = '';
@@ -78,6 +81,7 @@
       {#key current.id}
         <StoryPlayer
           {manifestUrl}
+          {subtitles}
           apiKey={API_KEY}
           muted
           onTime={handleTime}

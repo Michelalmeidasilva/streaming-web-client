@@ -11,6 +11,10 @@
   export let manifestUrl: string;
   export let apiKey: string;
   export let muted = true;
+  // Sidecar WebVTT subtitle tracks (from the distribution playback response).
+  // Side-loaded via Shaka's addTextTrackAsync so they work regardless of whether
+  // the manifest already advertises them.
+  export let subtitles: Array<{ url: string; language?: string; label?: string; default?: boolean }> = [];
   export let onTime: (currentSeconds: number, durationSeconds: number) => void = () => {};
   export let onEnded: () => void = () => {};
   export let onError: (message: string) => void = () => {};
@@ -27,6 +31,33 @@
   }
   function handleEnded() {
     onEnded();
+  }
+
+  // Side-load each WebVTT track and enable the default one. Failures are
+  // non-fatal: subtitles are an enhancement, not a playback dependency.
+  async function loadSubtitles() {
+    if (!player || !subtitles?.length) return;
+    let enabledDefault = false;
+    for (const track of subtitles) {
+      if (!track?.url) continue;
+      try {
+        const added = await player.addTextTrackAsync(
+          track.url,
+          track.language ?? 'und',
+          'subtitle',
+          'text/vtt',
+          undefined,
+          track.label ?? track.language,
+        );
+        if (track.default && !enabledDefault) {
+          player.selectTextTrack(added);
+          player.setTextTrackVisibility(true);
+          enabledDefault = true;
+        }
+      } catch (err) {
+        console.warn('Failed to load subtitle track', track.url, err);
+      }
+    }
   }
 
   onMount(async () => {
@@ -53,6 +84,7 @@
         onError(event.detail?.message ?? 'Erro ao reproduzir o vídeo.');
       });
       await player.load(manifestUrl);
+      await loadSubtitles();
       try {
         await video.play?.();
       } catch {

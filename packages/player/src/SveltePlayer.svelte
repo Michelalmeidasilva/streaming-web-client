@@ -1,12 +1,13 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { VodPlayer } from './VodPlayer';
-  import type { VodPlayerOptions } from './types';
+  import type { VodPlayerOptions, SubtitleTrack } from './types';
 
   export let manifestUrl: string;
   export let apiKey: string;
   export let autoplay = false;
   export let muted = false;
+  export let subtitles: SubtitleTrack[] = [];
 
   let container: HTMLDivElement;
   let player: VodPlayer;
@@ -18,7 +19,7 @@
       error = detail.message ?? 'Erro ao reproduzir o vídeo.';
     });
     try {
-      await player.load(manifestUrl);
+      await player.load(manifestUrl, subtitles);
     } catch {
       error = 'Não foi possível carregar o vídeo.';
     }

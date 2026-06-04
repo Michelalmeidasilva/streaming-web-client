@@ -48,7 +48,7 @@
     <div class="wgrid">
       <div class="main">
         <div class="player">
-          <SveltePlayer manifestUrl={manifest.manifest_url} apiKey={API_KEY} autoplay={false} />
+          <SveltePlayer manifestUrl={manifest.manifest_url} subtitles={manifest.subtitles} apiKey={API_KEY} autoplay={false} />
         </div>
         <h1 class="wtitle">{current ? current.title : 'Vídeo'}</h1>
         <div class="chips">

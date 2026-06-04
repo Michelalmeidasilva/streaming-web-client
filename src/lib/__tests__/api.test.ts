@@ -47,28 +47,39 @@ describe('api.ts', () => {
   });
 
   describe('getManifest()', () => {
-    it('chama /api/v1/manifests/:id', async () => {
+    it('chama /api/v1/manifest/:id', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ manifest_url: 'https://cdn/video.mpd', type: 'dash' }),
+        json: async () => ({ videoId: 'abc123', status: 'ready', hls: '', dash: 'https://cdn/video.mpd', cached: false }),
       });
 
       await getManifest('abc123');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:8082/api/v1/manifests/abc123',
+        'http://localhost:8082/api/v1/manifest/abc123',
         expect.anything()
       );
     });
 
-    it('retorna manifest_url e type', async () => {
+    it('prefere HLS e mapeia type', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ manifest_url: 'https://cdn/v.mpd', type: 'dash' }),
+        json: async () => ({ videoId: 'abc123', status: 'ready', hls: 'https://cdn/v.m3u8', dash: 'https://cdn/v.mpd', cached: false }),
       });
 
       const result = await getManifest('abc123');
-      expect(result).toEqual({ manifest_url: 'https://cdn/v.mpd', type: 'dash' });
+      expect(result).toEqual({ manifest_url: 'https://cdn/v.m3u8', type: 'hls', subtitles: [] });
+    });
+
+    it('cai para DASH e propaga subtitles', async () => {
+      const subtitles = [{ url: 'https://cdn/pt.vtt', language: 'pt', label: 'Português', default: true }];
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ videoId: 'abc123', status: 'ready', hls: '', dash: 'https://cdn/v.mpd', subtitles, cached: false }),
+      });
+
+      const result = await getManifest('abc123');
+      expect(result).toEqual({ manifest_url: 'https://cdn/v.mpd', type: 'dash', subtitles });
     });
 
     it('lança erro em 404', async () => {

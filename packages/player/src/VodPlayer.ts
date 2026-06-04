@@ -1,5 +1,5 @@
 import shaka from 'shaka-player/dist/shaka-player.ui';
-import type { VodPlayerOptions, VodPlayerEventName, VodPlayerMountOptions } from './types';
+import type { VodPlayerOptions, VodPlayerEventName, VodPlayerMountOptions, SubtitleTrack } from './types';
 
 export class VodPlayer {
   private player: InstanceType<typeof shaka.Player>;
@@ -39,10 +39,37 @@ export class VodPlayer {
     });
   }
 
-  async load(manifestUrl: string): Promise<void> {
+  async load(manifestUrl: string, subtitles: SubtitleTrack[] = []): Promise<void> {
     await this.readyPromise;
     await this.player.load(manifestUrl);
+    await this.loadSubtitles(subtitles);
     this.listeners.get('loaded')?.({});
+  }
+
+  // Side-loads sidecar WebVTT tracks and enables the default one. Failures are
+  // non-fatal: subtitles enhance playback, they are not required for it.
+  private async loadSubtitles(subtitles: SubtitleTrack[]): Promise<void> {
+    let enabledDefault = false;
+    for (const track of subtitles) {
+      if (!track?.url) continue;
+      try {
+        const added = await this.player.addTextTrackAsync(
+          track.url,
+          track.language ?? 'und',
+          'subtitle',
+          'text/vtt',
+          undefined,
+          track.label ?? track.language,
+        );
+        if (track.default && !enabledDefault) {
+          this.player.selectTextTrack(added);
+          this.player.setTextTrackVisibility(true);
+          enabledDefault = true;
+        }
+      } catch (err) {
+        console.warn('VodPlayer: failed to load subtitle track', track.url, err);
+      }
+    }
   }
 
   destroy(): void {
@@ -57,9 +84,9 @@ export class VodPlayer {
     container: string | HTMLElement,
     options: VodPlayerMountOptions
   ): VodPlayer {
-    const { manifestUrl, ...playerOptions } = options;
+    const { manifestUrl, subtitles, ...playerOptions } = options;
     const player = new VodPlayer(container, playerOptions);
-    player.load(manifestUrl);
+    player.load(manifestUrl, subtitles);
     return player;
   }
 }

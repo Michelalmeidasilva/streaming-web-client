@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { getManifest, listVideos, type ManifestResponse, type Video } from '$lib/api';
@@ -8,15 +7,17 @@
   import SveltePlayer from '@vod/player/svelte';
   import UpNextList from '$lib/components/UpNextList.svelte';
 
-  const id = $page.params.id;
-
   let manifest: ManifestResponse | null = null;
   let current: Video | null = null;
   let upNext: Video[] = [];
   let loading = true;
   let errorMsg = '';
+  let loadedId = '';
 
-  onMount(async () => {
+  async function load(id: string) {
+    loading = true;
+    errorMsg = '';
+    manifest = null;
     const [m, list] = await Promise.allSettled([getManifest(id), listVideos()]);
     if (m.status === 'fulfilled') manifest = m.value;
     else errorMsg = m.reason instanceof Error && m.reason.message === '404'
@@ -27,7 +28,15 @@
       upNext = list.value.filter((v) => v.id !== id).slice(0, 12);
     }
     loading = false;
-  });
+  }
+
+  // Re-run on route param change. SvelteKit reuses this component when
+  // navigating /watch/A -> /watch/B, so onMount fires only once; keying the
+  // load on $page.params.id makes "A seguir" clicks actually load the new video.
+  $: if ($page.params.id && $page.params.id !== loadedId) {
+    loadedId = $page.params.id;
+    load(loadedId);
+  }
 
   function watch(vid: string) { goto(`/watch/${vid}`); }
 </script>
@@ -48,7 +57,9 @@
     <div class="wgrid">
       <div class="main">
         <div class="player">
-          <SveltePlayer manifestUrl={manifest.manifest_url} subtitles={manifest.subtitles} apiKey={API_KEY} autoplay={false} />
+          {#key manifest.manifest_url}
+            <SveltePlayer manifestUrl={manifest.manifest_url} subtitles={manifest.subtitles} apiKey={API_KEY} autoplay={false} />
+          {/key}
         </div>
         <h1 class="wtitle">{current ? current.title : 'Vídeo'}</h1>
         <div class="chips">

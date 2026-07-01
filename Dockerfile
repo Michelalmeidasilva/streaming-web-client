@@ -26,7 +26,7 @@ ENV PUBLIC_REEL_MAX_SECONDS=$PUBLIC_REEL_MAX_SECONDS
 RUN npm run build
 
 # ── Serve stage ─────────────────────────────────────────────────────────────────
-FROM nginx:1.27-alpine
+FROM nginx:1.31-alpine
 
 COPY --from=builder /app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
